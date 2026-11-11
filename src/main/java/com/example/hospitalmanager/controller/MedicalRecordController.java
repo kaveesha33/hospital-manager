@@ -1,0 +1,4 @@
+package com.example.hospitalmanager.controller;
+
+public class MedicalRecordController {
+}
