@@ -41,36 +41,32 @@ public class SecurityConfig {
             throws Exception {
 
         http
-            // Disable CSRF for this stateless REST API
-            .csrf(csrf -> csrf.disable())
+                // Disable CSRF for this stateless REST API
+                .csrf(csrf -> csrf.disable())
 
-            // Do not create HTTP sessions
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(
-                    SessionCreationPolicy.STATELESS
-                )
-            )
+                // Do not create HTTP sessions
+                .sessionManagement(session -> session.sessionCreationPolicy(
+                        SessionCreationPolicy.STATELESS))
 
-            // Public and protected endpoints
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
-                .anyRequest().authenticated()
-            )
+                // Public and protected endpoints
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/api/auth/register",
+                                "/api/auth/login")
+                        .permitAll().anyRequest().authenticated())
 
-            // Custom authentication provider
-            .authenticationProvider(authenticationProvider)
+                // Custom authentication provider
+                .authenticationProvider(authenticationProvider)
 
-            // Custom JSON security errors
-            .exceptionHandling(exception -> exception
-                .authenticationEntryPoint(authenticationEntryPoint)
-                .accessDeniedHandler(accessDeniedHandler)
-            )
+                // Custom JSON security errors
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler))
 
-            // Execute JWT filter before username/password authentication
-            .addFilterBefore(
-                jwtAuthenticationFilter,
-                UsernamePasswordAuthenticationFilter.class
-            );
+                // Execute JWT filter before username/password authentication
+                .addFilterBefore(
+                        jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -82,18 +78,17 @@ public class SecurityConfig {
     }
 
     // Configure user authentication
-@Bean
-public AuthenticationProvider authenticationProvider(
-        UserDetailsService userDetailsService,
-        PasswordEncoder passwordEncoder) {
+    @Bean
+    public AuthenticationProvider authenticationProvider(
+            UserDetailsService userDetailsService,
+            PasswordEncoder passwordEncoder) {
 
-    DaoAuthenticationProvider provider =
-            new DaoAuthenticationProvider(userDetailsService);
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
 
-    provider.setPasswordEncoder(passwordEncoder);
+        provider.setPasswordEncoder(passwordEncoder);
 
-    return provider;
-}
+        return provider;
+    }
 
     // Provide AuthenticationManager for login operations
     @Bean
@@ -106,11 +101,9 @@ public AuthenticationProvider authenticationProvider(
 
     // Prevent the JWT filter from being registered twice
     @Bean
-    public FilterRegistrationBean<JwtAuthenticationFilter>
-            jwtFilterRegistration(JwtAuthenticationFilter filter) {
+    public FilterRegistrationBean<JwtAuthenticationFilter> jwtFilterRegistration(JwtAuthenticationFilter filter) {
 
-        FilterRegistrationBean<JwtAuthenticationFilter> registration =
-                new FilterRegistrationBean<>(filter);
+        FilterRegistrationBean<JwtAuthenticationFilter> registration = new FilterRegistrationBean<>(filter);
 
         registration.setEnabled(false);
 
